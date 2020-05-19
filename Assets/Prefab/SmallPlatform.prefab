@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3672559275999374637}
   - component: {fileID: 3672559275999374635}
   - component: {fileID: 3672559275999374636}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Tilemap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -232,7 +232,7 @@ GameObject:
   - component: {fileID: 3672559276384872434}
   - component: {fileID: 3672559276384872435}
   - component: {fileID: 3479282410300442210}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SmallPlatform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
