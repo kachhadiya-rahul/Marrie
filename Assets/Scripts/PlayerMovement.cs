@@ -38,16 +38,18 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    [Range(0, 100)]
+    [Range(0, 10)]
     public float HorizontalSpeed = 2f;
+    [Range(0, 100)]
+    public float HorizontalForce = 50f;
     [Range(0, 10)]
     public float JumpForce = 2f;
     private void FixedUpdate()
     {
-        bool ShouldIncreaseSpeed = Mathf.Abs(PlayerRigidBody.velocity.x) > 1 && Mathf.Sign(PlayerRigidBody.velocity.x) == Mathf.Sign(moveHorizontal);
+        bool ShouldIncreaseSpeed = Mathf.Abs(PlayerRigidBody.velocity.x) > HorizontalSpeed && Mathf.Sign(PlayerRigidBody.velocity.x) == Mathf.Sign(moveHorizontal);
         var shouldJump = moveVertical >= 0.01 && IsGrounded();
 
-        Vector2 movementMuliplier = new Vector2(!ShouldIncreaseSpeed ? HorizontalSpeed * moveHorizontal : 0, shouldJump ? JumpForce : 0);
+        Vector2 movementMuliplier = new Vector2(!ShouldIncreaseSpeed ? HorizontalForce * moveHorizontal : 0, shouldJump ? JumpForce : 0);
 
         var movementVector = new Vector2(1, 30);
         PlayerRigidBody.AddForce(movementVector * movementMuliplier);
@@ -73,7 +75,6 @@ public class PlayerMovement : MonoBehaviour
     {
         var cast = Physics2D.Raycast(transform.position, Vector2.down, distToGround + 0.4f, LayerMask.GetMask("Platform"));
         var val = cast.collider != null;
-        Debug.Log(val);
         return val;
     }
 }
