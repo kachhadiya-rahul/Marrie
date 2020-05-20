@@ -286,7 +286,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HorizontalSpeed: 2
   HorizontalForce: 100
-  JumpForce: 10
+  JumpForce: 3.5
 --- !u!1001 &218038026
 PrefabInstance:
   m_ObjectHideFlags: 0

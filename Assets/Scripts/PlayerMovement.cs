@@ -51,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector2 movementMuliplier = new Vector2(!ShouldIncreaseSpeed ? HorizontalForce * moveHorizontal : 0, shouldJump ? JumpForce : 0);
 
-        var movementVector = new Vector2(1, 30);
+        var movementVector = new Vector2(1, 100);
         PlayerRigidBody.AddForce(movementVector * movementMuliplier);
 
         if (shouldJump)
