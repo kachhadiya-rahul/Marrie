@@ -54,10 +54,18 @@ public class PlayerMovement : MonoBehaviour
     public float JumpForce = 2f;
     private void FixedUpdate()
     {
-        #region Apply forces to the player for movement
         bool shouldCrouch = moveVertical <= -0.01 && IsGrounded() || (animator.GetBool("crouch") && CanNotStand());
         bool shouldNotIncreaseSpeed = Mathf.Abs(PlayerRigidBody.velocity.x) > (shouldCrouch ? CrouchSpeed : HorizontalSpeed) && Mathf.Sign(PlayerRigidBody.velocity.x) == Mathf.Sign(moveHorizontal);
         var shouldJump = moveVertical >= 0.01 && IsGrounded() && !shouldCrouch && (PlayerRigidBody.velocity.y < 0.01);
+        bool shouldDie = transform.position.y <= Camera.main.ScreenToWorldPoint(new Vector3(0, 50)).y;
+        if (shouldDie)
+        {
+            
+            animator.SetTrigger("hurt");
+            PlayerRigidBody.velocity = Vector3.zero;
+            return;
+        }
+        #region Apply forces to the player for movement
 
         Vector2 movementMuliplier = new Vector2(!shouldNotIncreaseSpeed ? (shouldCrouch ? CrouchForce: HorizontalForce) * moveHorizontal : 0, shouldJump ? JumpForce : 0);
 
