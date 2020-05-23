@@ -7,7 +7,7 @@ public class CherryItem : MonoBehaviour, Icollectible
     public void CollectItem()
     {
         gameObject.SetActive(false);
-        Debug.Log("Cherry Item collected");
+        //Debug.Log("Cherry Item collected");
 
     }
 

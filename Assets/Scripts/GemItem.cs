@@ -7,7 +7,7 @@ public class GemItem : MonoBehaviour, Icollectible
     public void CollectItem()
     {
         gameObject.SetActive(false);
-        Debug.Log("Gem Item collected");
+        //Debug.Log("Gem Item collected");
     }
 
     // Start is called before the first frame update
