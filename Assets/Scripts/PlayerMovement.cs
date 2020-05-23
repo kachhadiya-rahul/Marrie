@@ -13,14 +13,21 @@ public class PlayerMovement : MonoBehaviour
 
     float playerRightScale;
 
+    BoxCollider2D headCollider;
+    CircleCollider2D legsCollider;
+
     // Start is called before the first frame update
     void Start()
     {
         PlayerRigidBody = GetComponent<Rigidbody2D>();
         PlayerTransform = GetComponent<Transform>();
-        distToGround = GetComponent<Collider2D>().bounds.extents.y;
+        headCollider = GetComponent<BoxCollider2D>();
+        legsCollider = GetComponent<CircleCollider2D>();
+        distToGround = legsCollider.radius;
         animator = GetComponent<Animator>();
         playerRightScale = PlayerTransform.localScale.x;
+        
+
     }
 
     float moveVertical;
@@ -32,6 +39,8 @@ public class PlayerMovement : MonoBehaviour
         moveHorizontal = Input.GetAxis("Horizontal");
         
     }
+
+
 
     [Range(0, 10)]
     public float HorizontalSpeed = 4f;
@@ -46,14 +55,15 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         #region Apply forces to the player for movement
-        var shouldJump = moveVertical >= 0.01 && IsGrounded();
-        bool shouldCrouch = IsGrounded() && moveVertical <= -0.01;
+        bool shouldCrouch = moveVertical <= -0.01 && IsGrounded() || (animator.GetBool("crouch") && CanNotStand());
         bool shouldNotIncreaseSpeed = Mathf.Abs(PlayerRigidBody.velocity.x) > (shouldCrouch ? CrouchSpeed : HorizontalSpeed) && Mathf.Sign(PlayerRigidBody.velocity.x) == Mathf.Sign(moveHorizontal);
+        var shouldJump = moveVertical >= 0.01 && IsGrounded() && !shouldCrouch && (PlayerRigidBody.velocity.y < 0.01);
 
-        Vector2 movementMuliplier = new Vector2(!shouldNotIncreaseSpeed ? (shouldCrouch?CrouchForce: HorizontalForce) * moveHorizontal : 0, shouldJump ? JumpForce : 0);
+        Vector2 movementMuliplier = new Vector2(!shouldNotIncreaseSpeed ? (shouldCrouch ? CrouchForce: HorizontalForce) * moveHorizontal : 0, shouldJump ? JumpForce : 0);
 
         var movementVector = new Vector2(1, 100);
         PlayerRigidBody.AddForce(movementVector * movementMuliplier);
+        
 
         #endregion
 
@@ -77,10 +87,12 @@ public class PlayerMovement : MonoBehaviour
         {
             playerState = PlayerState.CROUCH;
             animator.SetBool("crouch", true);
+            headCollider.enabled = false;
         }
         else
         {
             animator.SetBool("crouch", false);
+            headCollider.enabled = true;
         }
         animator.SetFloat("land", PlayerRigidBody.velocity.y);
         #endregion
@@ -102,10 +114,19 @@ public class PlayerMovement : MonoBehaviour
     //is player standing on ground
     bool IsGrounded()
     {
-        var cast = Physics2D.Raycast(transform.position, Vector2.down, distToGround + 0.4f, LayerMask.GetMask("Platform"));
-        var val = cast.collider != null;
-        return val;
+        var cast = Physics2D.Raycast(legsCollider.bounds.center, Vector2.down, distToGround + 0.01f, LayerMask.GetMask("Platform")).collider!=null;
+        cast = cast || Physics2D.Raycast(legsCollider.bounds.center + new Vector3(legsCollider.radius,0), Vector2.down, distToGround + 0.01f, LayerMask.GetMask("Platform")).collider != null;
+        cast = cast || Physics2D.Raycast(legsCollider.bounds.center - new Vector3(legsCollider.radius  , 0), Vector2.down, distToGround + 0.01f, LayerMask.GetMask("Platform")).collider != null;
+        return cast;
     }
+    bool CanNotStand()
+    {
+        var cast = Physics2D.Raycast(transform.position + new Vector3(headCollider.offset.x, headCollider.offset.y), Vector2.up, headCollider.size.y/2 + 0.01f, LayerMask.GetMask("Platform")).collider!=null;
+        cast = cast || Physics2D.Raycast(transform.position + new Vector3(headCollider.offset.x, headCollider.offset.y) + new Vector3(headCollider.size.x / 2, 0), Vector2.up, headCollider.size.y / 2 + 0.01f, LayerMask.GetMask("Platform")).collider != null;
+        cast = cast || Physics2D.Raycast(transform.position + new Vector3(headCollider.offset.x, headCollider.offset.y) - new Vector3(headCollider.size.x / 2, 0), Vector2.up, headCollider.size.y / 2 + 0.01f, LayerMask.GetMask("Platform")).collider != null;
+        return cast;
+    }
+
 
     public enum PlayerState
     {
